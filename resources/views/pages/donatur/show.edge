@@ -1,0 +1,155 @@
+@layout.app({ title: "Detail Donatur" })
+  @slot('meta')
+    <meta name="description" content="Halaman detail donatur dengan histori donasi">
+  @endslot
+
+  @slot('main')
+    <!-- Header Section -->
+    <div class="bg-white rounded-lg shadow-sm mb-6">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <a href="{{ route('donaturs.index') }}" 
+               class="text-gray-600 hover:text-gray-800">
+              ← Kembali
+            </a>
+            <h1 class="text-2xl font-bold text-gray-900">Detail Donatur</h1>
+          </div>
+          <div class="flex space-x-2">
+            <a href="{{ route('donaturs.edit', [donatur.id]) }}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+              Edit
+            </a>
+            <form method="POST" action="{{ route('donaturs.destroy', [donatur.id]) }}?_method=DELETE" class="inline">
+              {{ csrfField() }}
+              <button type="submit" 
+                      class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                      onclick="return confirm('Apakah Anda yakin ingin menghapus donatur ini?')">
+                Hapus
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Donatur Information -->
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Basic Info -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Informasi Donatur</h3>
+            <dl class="space-y-4">
+              <div>
+                <dt class="text-sm font-medium text-gray-500">ID</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ donatur.id }}</dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Nama Lengkap</dt>
+                <dd class="mt-1 text-lg font-semibold text-gray-900">{{ donatur.nama }}</dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Email</dt>
+                <dd class="mt-1 text-sm text-gray-900">
+                  <a href="mailto:{{ donatur.email }}" class="text-blue-600 hover:text-blue-800">
+                    {{ donatur.email }}
+                  </a>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Telepon</dt>
+                <dd class="mt-1 text-sm text-gray-900">
+                  <a href="tel:{{ donatur.telepon }}" class="text-blue-600 hover:text-blue-800">
+                    {{ donatur.telepon }}
+                  </a>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Terdaftar</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ donatur.createdAt.toFormat('dd/MM/yyyy HH:mm:ss') }}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Donation Summary -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Ringkasan Donasi</h3>
+            <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6">
+              <div class="text-center">
+                <div class="text-3xl font-bold text-green-600 mb-2">
+                  Rp {{ totalDonasi.toLocaleString('id-ID') }}
+                </div>
+                <div class="text-sm text-gray-600 mb-4">Total Donasi</div>
+                <div class="flex justify-center space-x-4 text-sm">
+                  <div class="text-center">
+                    <div class="font-semibold text-gray-900">{{ donatur.donasis.length }}</div>
+                    <div class="text-gray-500">Transaksi</div>
+                  </div>
+                  @if(donatur.donasis.length > 0)
+                    <div class="text-center">
+                      <div class="font-semibold text-gray-900">
+                        Rp {{ Math.round(totalDonasi / donatur.donasis.length).toLocaleString('id-ID') }}
+                      </div>
+                      <div class="text-gray-500">Rata-rata</div>
+                    </div>
+                  @endif
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donation History Section -->
+    <div class="bg-white rounded-lg shadow-sm">
+      <div class="p-6 border-b border-gray-200">
+        <h2 class="text-xl font-bold text-gray-900">Histori Donasi</h2>
+      </div>
+      <div class="p-6">
+        @if(donatur.donasis.length > 0)
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                @each(donasi in donatur.donasis)
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {{ donasi.tanggal.toFormat('dd/MM/yyyy') }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                      Rp {{ donasi.jumlah.toLocaleString('id-ID') }}
+                    </td>                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ donasi.kategori.nama_kategori }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Berhasil
+                      </span>
+                    </td>
+                  </tr>
+                @endeach
+              </tbody>
+            </table>
+          </div>
+        @else
+          <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Belum ada donasi</h3>
+            <p class="mt-1 text-sm text-gray-500">Donatur ini belum melakukan donasi apapun.</p>
+          </div>
+        @endif
+      </div>
+    </div>
+  @endslot
+@end

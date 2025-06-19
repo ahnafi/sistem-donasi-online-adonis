@@ -10,6 +10,7 @@
 import router from '@adonisjs/core/services/router'
 const KategorisController = () => import('#controllers/kategoris_controller')
 const KampanyesController = () => import('#controllers/kampanyes_controller')
+const DonatursController = () => import('#controllers/donaturs_controller')
 
 // dashboard
 router.on('/').render('pages/dashboard')
@@ -42,6 +43,18 @@ router
   .prefix('/kampanyes')
   .as('kampanyes')
 
-// donatur
+// donatur routes
+router
+  .group(() => {
+    router.get('/', [DonatursController, 'index']).as('index')
+    router.get('/create', [DonatursController, 'create']).as('create')
+    router.post('/', [DonatursController, 'store']).as('store')
+    router.get('/:id', [DonatursController, 'show']).as('show')
+    router.get('/:id/edit', [DonatursController, 'edit']).as('edit')
+    router.put('/:id', [DonatursController, 'update']).as('update')
+    router.delete('/:id', [DonatursController, 'destroy']).as('destroy')
+  })
+  .prefix('/donaturs')
+  .as('donaturs')
 
 // donasi

@@ -25,13 +25,13 @@ export default class Donasi extends BaseModel {
   declare donaturId: number
 
   @belongsTo(() => Donatur)
-  declare donaturs: BelongsTo<typeof Donatur>
+  declare donatur: BelongsTo<typeof Donatur>
 
   @column()
   declare kategoriId: number
 
   @belongsTo(() => Kategori)
-  declare kategoris: BelongsTo<typeof Kategori>
+  declare kategori: BelongsTo<typeof Kategori>
 
   @hasOne(() => TransaksiDonasi)
   declare transaksiDonasi: HasOne<typeof TransaksiDonasi>
