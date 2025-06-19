@@ -1,0 +1,214 @@
+@layout.app({ title: "Detail Donasi" })
+  @slot('meta')
+    <meta name="description" content="Halaman detail donasi dan transaksi">
+  @endslot
+
+  @slot('main')
+    <div class="bg-white rounded-lg shadow-sm">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <a href="{{ route('donasis.index') }}" 
+               class="text-gray-600 hover:text-gray-800">
+              ← Kembali
+            </a>
+            <h1 class="text-2xl font-bold text-gray-900">Detail Donasi & Transaksi</h1>
+          </div>
+          <div class="flex space-x-2">
+            <a href="{{ route('donasis.edit', [donasi.id]) }}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+              Edit
+            </a>
+            <form method="POST" action="{{ route('donasis.destroy', [donasi.id]) }}?_method=DELETE" class="inline">
+              {{ csrfField() }}
+              <button type="submit" 
+                      class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                      onclick="return confirm('Apakah Anda yakin ingin menghapus donasi ini?')">
+                Hapus
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Donation Information -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Informasi Donasi</h3>
+            <div class="bg-gray-50 rounded-lg p-6">
+              <dl class="space-y-4">
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">ID Donasi</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{ donasi.id }}</dd>
+                </div>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">Donatur</dt>
+                  <dd class="mt-1 text-lg font-semibold text-gray-900">{{ donasi.donatur.nama }}</dd>
+                  <dd class="text-sm text-gray-600">
+                    <a href="mailto:{{ donasi.donatur.email }}" class="text-blue-600 hover:text-blue-800">
+                      {{ donasi.donatur.email }}
+                    </a>
+                  </dd>
+                  <dd class="text-sm text-gray-600">
+                    <a href="tel:{{ donasi.donatur.telepon }}" class="text-blue-600 hover:text-blue-800">
+                      {{ donasi.donatur.telepon }}
+                    </a>
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">Jumlah Donasi</dt>
+                  <dd class="mt-1 text-2xl font-bold text-green-600">
+                    Rp {{ donasi.jumlah.toLocaleString('id-ID') }}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">Tanggal Donasi</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{ donasi.tanggal.toFormat('dd/MM/yyyy') }}</dd>
+                </div>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">Kategori</dt>
+                  <dd class="mt-1">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {{ donasi.kategori.nama_kategori }}
+                    </span>
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          <!-- Transaction Information -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Informasi Transaksi</h3>
+            <div class="bg-gray-50 rounded-lg p-6">
+              <dl class="space-y-4">
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">ID Transaksi</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{ donasi.transaksiDonasi.id }}</dd>
+                </div>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">Kampanye</dt>
+                  <dd class="mt-1 text-lg font-semibold text-gray-900">{{ donasi.transaksiDonasi.kampanye.namaKampanye }}</dd>
+                  <dd class="text-sm text-gray-600">
+                    Target: Rp {{ donasi.transaksiDonasi.kampanye.target.toLocaleString('id-ID') }}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">Status Transaksi</dt>
+                  <dd class="mt-1">
+                    @if(donasi.transaksiDonasi.status === 'PENDING')
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                        🕐 PENDING
+                      </span>
+                    @elseif(donasi.transaksiDonasi.status === 'SUCCESS')
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        ✅ SUCCESS
+                      </span>
+                    @else
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                        ❌ FAILED
+                      </span>
+                    @endif
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">Tanggal Transaksi</dt>
+                  <dd class="mt-1 text-sm text-gray-900">{{ donasi.transaksiDonasi.createdAt.toFormat('dd/MM/yyyy HH:mm:ss') }}</dd>
+                </div>
+                @if(donasi.transaksiDonasi.status !== 'PENDING')
+                  <div>
+                    <dt class="text-sm font-medium text-gray-500">Terakhir Update</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ donasi.transaksiDonasi.updatedAt.toFormat('dd/MM/yyyy HH:mm:ss') }}</dd>
+                  </div>
+                @endif
+              </dl>
+
+              <!-- Status Update Actions -->
+              @if(donasi.transaksiDonasi.status === 'PENDING')
+                <div class="mt-6 pt-4 border-t border-gray-200">
+                  <h4 class="text-sm font-medium text-gray-700 mb-3">Ubah Status Transaksi</h4>
+                  <div class="flex space-x-3">
+                    <form method="POST" action="{{ route('donasis.updateStatus', [donasi.id]) }}?_method=PATCH" class="inline">
+                      {{ csrfField() }}
+                      <input type="hidden" name="status" value="SUCCESS">
+                      <button type="submit" 
+                              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        ✓ Tandai Berhasil
+                      </button>
+                    </form>
+                    <form method="POST" action="{{ route('donasis.updateStatus', [donasi.id]) }}?_method=PATCH" class="inline">
+                      {{ csrfField() }}
+                      <input type="hidden" name="status" value="FAILED">
+                      <button type="submit" 
+                              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        ✗ Tandai Gagal
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              @endif
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline Section -->
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Timeline</h3>
+          <div class="bg-gray-50 rounded-lg p-6">
+            <div class="flow-root">
+              <ul class="relative">
+                <li class="relative pb-4">
+                  <div class="relative flex items-start space-x-3">
+                    <div class="relative">
+                      <div class="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center ring-8 ring-white">
+                        <span class="text-white text-xs font-bold">1</span>
+                      </div>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div>
+                        <p class="text-sm text-gray-900 font-medium">Donasi Dibuat</p>
+                        <p class="text-xs text-gray-500">{{ donasi.createdAt.toFormat('dd/MM/yyyy HH:mm:ss') }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                
+                <li class="relative pb-4">
+                  <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div class="h-px w-full bg-gray-200"></div>
+                  </div>
+                  <div class="relative flex items-start space-x-3">
+                    <div class="relative">
+                      @if(donasi.transaksiDonasi.status === 'SUCCESS')
+                        <div class="h-8 w-8 bg-green-500 rounded-full flex items-center justify-center ring-8 ring-white">
+                          <span class="text-white text-xs">✓</span>
+                        </div>
+                      @elseif(donasi.transaksiDonasi.status === 'FAILED')
+                        <div class="h-8 w-8 bg-red-500 rounded-full flex items-center justify-center ring-8 ring-white">
+                          <span class="text-white text-xs">✗</span>
+                        </div>
+                      @else
+                        <div class="h-8 w-8 bg-yellow-500 rounded-full flex items-center justify-center ring-8 ring-white">
+                          <span class="text-white text-xs">⏳</span>
+                        </div>
+                      @endif
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div>
+                        <p class="text-sm text-gray-900 font-medium">
+                          Status: {{ donasi.transaksiDonasi.status }}
+                        </p>
+                        <p class="text-xs text-gray-500">{{ donasi.transaksiDonasi.updatedAt.toFormat('dd/MM/yyyy HH:mm:ss') }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  @endslot
+@end

@@ -11,9 +11,11 @@ import router from '@adonisjs/core/services/router'
 const KategorisController = () => import('#controllers/kategoris_controller')
 const KampanyesController = () => import('#controllers/kampanyes_controller')
 const DonatursController = () => import('#controllers/donaturs_controller')
+const DonasisController = () => import('#controllers/donasis_controller')
+const DashboardController = () => import('#controllers/dashboard_controller')
 
 // dashboard
-router.on('/').render('pages/dashboard')
+router.get('/', [DashboardController, 'index']).as('dashboard')
 
 // kategori routes
 router
@@ -57,4 +59,17 @@ router
   .prefix('/donaturs')
   .as('donaturs')
 
-// donasi
+// donasi routes
+router
+  .group(() => {
+    router.get('/', [DonasisController, 'index']).as('index')
+    router.get('/create', [DonasisController, 'create']).as('create')
+    router.post('/', [DonasisController, 'store']).as('store')
+    router.get('/:id', [DonasisController, 'show']).as('show')
+    router.get('/:id/edit', [DonasisController, 'edit']).as('edit')
+    router.put('/:id', [DonasisController, 'update']).as('update')
+    router.patch('/:id/status', [DonasisController, 'updateStatus']).as('updateStatus')
+    router.delete('/:id', [DonasisController, 'destroy']).as('destroy')
+  })
+  .prefix('/donasis')
+  .as('donasis')

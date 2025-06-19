@@ -15,7 +15,7 @@ export default class TransaksiDonasi extends BaseModel {
   declare kampanyeId: number
 
   @column()
-  declare status: string
+  declare status: 'PENDING' | 'SUCCESS' | 'FAILED'
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -24,8 +24,8 @@ export default class TransaksiDonasi extends BaseModel {
   declare updatedAt: DateTime
 
   @belongsTo(() => Donasi)
-  declare donasis: BelongsTo<typeof Donasi>
+  declare donasi: BelongsTo<typeof Donasi>
 
   @belongsTo(() => Kampanye)
-  declare kampanyes: BelongsTo<typeof Kampanye>
+  declare kampanye: BelongsTo<typeof Kampanye>
 }

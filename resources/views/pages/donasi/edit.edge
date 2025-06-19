@@ -1,0 +1,125 @@
+@layout.app({ title: "Edit Donasi" })
+  @slot('meta')
+    <meta name="description" content="Halaman edit donasi">
+  @endslot
+
+  @slot('main')
+    <div class="bg-white rounded-lg shadow-sm">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center space-x-4">
+          <a href="{{ route('donasis.index') }}" 
+             class="text-gray-600 hover:text-gray-800">
+            ← Kembali
+          </a>
+          <h1 class="text-2xl font-bold text-gray-900">Edit Donasi</h1>
+        </div>
+      </div>
+
+      @if(flashMessages.has('error'))
+        <div class="m-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+          {{ flashMessages.get('error') }}
+        </div>
+      @endif
+
+      <div class="p-6">
+        <form method="POST" action="{{ route('donasis.update', [donasi.id]) }}?_method=PUT" class="max-w-md">
+          {{ csrfField() }}
+          
+          <div class="mb-6">
+            <label for="donaturId" class="block text-sm font-medium text-gray-700 mb-2">
+              Donatur <span class="text-red-500">*</span>
+            </label>
+            <select id="donaturId" 
+                    name="donaturId" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required>
+              <option value="">Pilih Donatur</option>
+              @each(donatur in donaturs)
+                <option value="{{ donatur.id }}" 
+                        {{ (old('donaturId', donasi.donaturId) == donatur.id) ? 'selected' : '' }}>
+                  {{ donatur.nama }} - {{ donatur.email }}
+                </option>
+              @endeach
+            </select>
+            @if(flashMessages.has('errors.donaturId'))
+              <p class="mt-1 text-sm text-red-600">{{ flashMessages.get('errors.donaturId') }}</p>
+            @endif
+          </div>
+
+          <div class="mb-6">
+            <label for="kampanyeId" class="block text-sm font-medium text-gray-700 mb-2">
+              Kampanye <span class="text-red-500">*</span>
+            </label>
+            <select id="kampanyeId" 
+                    name="kampanyeId" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required>
+              <option value="">Pilih Kampanye</option>
+              @each(kampanye in kampanyes)
+                <option value="{{ kampanye.id }}" 
+                        {{ (old('kampanyeId', donasi.transaksiDonasi.kampanyeId) == kampanye.id) ? 'selected' : '' }}>
+                  {{ kampanye.namaKampanye }} ({{ kampanye.kategori.nama_kategori }})
+                </option>
+              @endeach
+            </select>
+            @if(flashMessages.has('errors.kampanyeId'))
+              <p class="mt-1 text-sm text-red-600">{{ flashMessages.get('errors.kampanyeId') }}</p>
+            @endif
+            <p class="mt-1 text-xs text-gray-500">Kategori akan diperbarui otomatis berdasarkan kampanye yang dipilih</p>
+          </div>
+
+          <div class="mb-6">
+            <label for="jumlah" class="block text-sm font-medium text-gray-700 mb-2">
+              Jumlah Donasi <span class="text-red-500">*</span>
+            </label>
+            <input type="number" 
+                   id="jumlah" 
+                   name="jumlah" 
+                   value="{{ old('jumlah', donasi.jumlah) }}"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   placeholder="Masukkan jumlah donasi"
+                   min="1000"
+                   required>
+            @if(flashMessages.has('errors.jumlah'))
+              <p class="mt-1 text-sm text-red-600">{{ flashMessages.get('errors.jumlah') }}</p>
+            @endif
+          </div>
+
+          <div class="mb-6">
+            <label for="tanggal" class="block text-sm font-medium text-gray-700 mb-2">
+              Tanggal Donasi <span class="text-red-500">*</span>
+            </label>
+            <input type="date" 
+                   id="tanggal" 
+                   name="tanggal" 
+                   value="{{ old('tanggal', donasi.tanggal.toFormat('yyyy-MM-dd')) }}"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   required>
+            @if(flashMessages.has('errors.tanggal'))
+              <p class="mt-1 text-sm text-red-600">{{ flashMessages.get('errors.tanggal') }}</p>
+            @endif
+          </div>
+
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <h3 class="text-sm font-medium text-yellow-800 mb-2">Status Transaksi Saat Ini</h3>
+            <p class="text-sm text-yellow-700">
+              Status: <strong>{{ donasi.transaksiDonasi.status }}</strong><br>
+              <span class="text-xs">Status transaksi dapat diubah di halaman daftar donasi</span>
+            </p>
+          </div>
+
+          <div class="flex space-x-4">
+            <button type="submit" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+              Perbarui Donasi
+            </button>
+            <a href="{{ route('donasis.index') }}" 
+               class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-2 rounded-lg font-medium transition-colors">
+              Batal
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  @endslot
+@end
