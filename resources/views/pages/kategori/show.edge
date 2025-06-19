@@ -1,0 +1,83 @@
+@layout.app({ title: "Detail Kategori" })
+  @slot('meta')
+    <meta name="description" content="Halaman detail kategori" />
+  @endslot
+  
+  @slot('main')
+    <div class="bg-white rounded-lg shadow-sm">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <a href="{{ route('kategoris.index') }}" class="text-gray-600 hover:text-gray-800">
+              ← Kembali
+            </a>
+            <h1 class="text-2xl font-bold text-gray-900">
+              Detail Kategori
+            </h1>
+          </div>
+          <div class="flex space-x-2">
+            <a
+              href="{{ route('kategoris.edit', [kategori.id]) }}"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              Edit
+            </a>
+            <form
+              method="POST"
+              action="{{ route('kategoris.destroy', [kategori.id]) }}?_method=DELETE"
+              class="inline"
+            >
+              {{ csrfField() }}
+              <button
+                type="submit"
+                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini?')"
+              >
+                Hapus
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <div class="max-w-2xl">
+          <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+            <div>
+              <dt class="text-sm font-medium text-gray-500">
+                ID
+              </dt>
+              <dd class="mt-1 text-sm text-gray-900">
+                {{ kategori.id }}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-500">
+                Nama Kategori
+              </dt>
+              <dd class="mt-1 text-sm text-gray-900 font-semibold">
+                {{ kategori.nama_kategori }}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-500">
+                Dibuat
+              </dt>
+              <dd class="mt-1 text-sm text-gray-900">
+                {{ kategori.createdAt.toFormat('dd/MM/yyyy HH:mm:ss') }}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-500">
+                Terakhir Diperbarui
+              </dt>
+              <dd class="mt-1 text-sm text-gray-900">
+                {{ kategori.updatedAt.toFormat('dd/MM/yyyy HH:mm:ss') }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  @endslot
+@end
