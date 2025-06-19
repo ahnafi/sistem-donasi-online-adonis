@@ -24,8 +24,8 @@ export default class Kampanye extends BaseModel {
   declare updatedAt: DateTime
 
   @belongsTo(() => Kategori)
-  declare kategoris: BelongsTo<typeof Kategori>
+  declare kategori: BelongsTo<typeof Kategori>
 
   @hasMany(() => TransaksiDonasi)
-  declare TransaksiDonasis: HasMany<typeof TransaksiDonasi>
+  declare transaksiDonasis: HasMany<typeof TransaksiDonasi>
 }
