@@ -3,7 +3,7 @@ import { BaseModel, column, belongsTo, hasOne } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasOne } from '@adonisjs/lucid/types/relations'
 import Kategori from '#models/kategori'
 import Donatur from '#models/donatur'
-import TransaksiDonasi from './transaksi_donasi.js'
+import TransaksiDonasi from '#models/transaksi_donasi'
 
 export default class Donasi extends BaseModel {
   @column({ isPrimary: true })

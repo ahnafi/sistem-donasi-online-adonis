@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import Kategori from '#models/kategori'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
-import TransaksiDonasi from './transaksi_donasi.js'
+import TransaksiDonasi from '#models/transaksi_donasi'
 
 export default class Kampanye extends BaseModel {
   @column({ isPrimary: true })

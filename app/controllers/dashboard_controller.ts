@@ -5,11 +5,7 @@ import Donatur from '#models/donatur'
 import Donasi from '#models/donasi'
 
 export default class DashboardController {
-  /**
-   * Display dashboard with statistics and recent donations
-   */
   async index({ view }: HttpContext) {
-    // Get counts for all entities
     const [kategoriCount, kampanyeCount, donaturCount, donasiCount] = await Promise.all([
       Kategori.query().count('* as total'),
       Kampanye.query().count('* as total'),
@@ -17,7 +13,6 @@ export default class DashboardController {
       Donasi.query().count('* as total'),
     ])
 
-    // Get 10 latest donations with related data
     const recentDonations = await Donasi.query()
       .preload('donatur')
       .preload('kategori')
@@ -27,7 +22,6 @@ export default class DashboardController {
       .orderBy('created_at', 'desc')
       .limit(10)
 
-    // Calculate total donation amount
     const totalDonationResult = await Donasi.query().sum('jumlah as total').first()
 
     const totalDonationAmount = totalDonationResult?.$extras.total || 0

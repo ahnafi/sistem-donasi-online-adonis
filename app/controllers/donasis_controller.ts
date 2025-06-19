@@ -8,9 +8,6 @@ import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 
 export default class DonasisController {
-  /**
-   * Display a list of donasi with transaction status
-   */
   async index({ view }: HttpContext) {
     const donasis = await Donasi.query()
       .preload('donatur')
@@ -23,27 +20,20 @@ export default class DonasisController {
     return view.render('pages/donasi/index', { donasis })
   }
 
-  /**
-   * Display the form for creating new donasi
-   */
   async create({ view }: HttpContext) {
     const donaturs = await Donatur.all()
     const kampanyes = await Kampanye.query().preload('kategori')
     return view.render('pages/donasi/create', { donaturs, kampanyes })
   }
 
-  /**
-   * Handle form submission for the create action
-   */
   async store({ request, response, session }: HttpContext) {
     const trx = await db.transaction()
 
     try {
       const payload = await request.validateUsing(createDonasiValidator)
 
-      // Get kampanye to get kategoriId
       const kampanye = await Kampanye.findOrFail(payload.kampanyeId)
-      // Create donasi
+
       const donasi = await Donasi.create(
         {
           jumlah: payload.jumlah,
@@ -54,7 +44,6 @@ export default class DonasisController {
         { client: trx }
       )
 
-      // Create transaksi donasi
       await TransaksiDonasi.create(
         {
           donasiId: donasi.id,
@@ -75,9 +64,6 @@ export default class DonasisController {
     }
   }
 
-  /**
-   * Show individual donasi
-   */
   async show({ params, view }: HttpContext) {
     const donasi = await Donasi.query()
       .where('id', params.id)
@@ -91,9 +77,6 @@ export default class DonasisController {
     return view.render('pages/donasi/show', { donasi })
   }
 
-  /**
-   * Edit individual donasi
-   */
   async edit({ params, view }: HttpContext) {
     const donasi = await Donasi.query()
       .where('id', params.id)
@@ -106,9 +89,6 @@ export default class DonasisController {
     return view.render('pages/donasi/edit', { donasi, donaturs, kampanyes })
   }
 
-  /**
-   * Handle form submission for the edit action
-   */
   async update({ params, request, response, session }: HttpContext) {
     const trx = await db.transaction()
 
@@ -116,9 +96,8 @@ export default class DonasisController {
       const donasi = await Donasi.findOrFail(params.id)
       const payload = await request.validateUsing(updateDonasiValidator)
 
-      // Get kampanye to get kategoriId
       const kampanye = await Kampanye.findOrFail(payload.kampanyeId)
-      // Update donasi
+
       await donasi
         .merge({
           jumlah: payload.jumlah,
@@ -128,7 +107,6 @@ export default class DonasisController {
         })
         .save()
 
-      // Update transaksi donasi
       const transaksi = await TransaksiDonasi.query().where('donasi_id', donasi.id).firstOrFail()
 
       await transaksi
@@ -148,9 +126,6 @@ export default class DonasisController {
     }
   }
 
-  /**
-   * Update transaction status
-   */
   async updateStatus({ params, request, response, session }: HttpContext) {
     try {
       const { status } = request.only(['status'])
@@ -172,19 +147,14 @@ export default class DonasisController {
     }
   }
 
-  /**
-   * Delete individual donasi
-   */
   async destroy({ params, response, session }: HttpContext) {
     const trx = await db.transaction()
 
     try {
       const donasi = await Donasi.findOrFail(params.id)
 
-      // Delete transaksi donasi first (due to foreign key)
       await TransaksiDonasi.query().where('donasi_id', donasi.id).delete()
 
-      // Delete donasi
       await donasi.delete()
 
       await trx.commit()

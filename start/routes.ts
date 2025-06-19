@@ -8,68 +8,85 @@
 */
 
 import router from '@adonisjs/core/services/router'
+import { middleware } from './kernel.js'
 const KategorisController = () => import('#controllers/kategoris_controller')
 const KampanyesController = () => import('#controllers/kampanyes_controller')
 const DonatursController = () => import('#controllers/donaturs_controller')
 const DonasisController = () => import('#controllers/donasis_controller')
 const DashboardController = () => import('#controllers/dashboard_controller')
+const AuthController = () => import('#controllers/auth_controller')
 
-// dashboard
-router.get('/', [DashboardController, 'index']).as('dashboard')
-
-// kategori routes
 router
   .group(() => {
-    router.get('/', [KategorisController, 'index']).as('index')
-    router.get('/create', [KategorisController, 'create']).as('create')
-    router.post('/', [KategorisController, 'store']).as('store')
-    router.get('/:id', [KategorisController, 'show']).as('show')
-    router.get('/:id/edit', [KategorisController, 'edit']).as('edit')
-    router.put('/:id', [KategorisController, 'update']).as('update')
-    router.delete('/:id', [KategorisController, 'destroy']).as('destroy')
+    router.get('/login', [AuthController, 'loginShow']).as('login')
+    router.post('/login', [AuthController, 'login'])
+    router.get('/register', [AuthController, 'registerShow']).as('register')
+    router.post('/register', [AuthController, 'register'])
   })
-  .prefix('/kategoris')
-  .as('kategoris')
+  .use(middleware.guest())
 
-// kampanye routes
+router.post('/logout', [AuthController, 'logout']).as('logout')
+
 router
   .group(() => {
-    router.get('/', [KampanyesController, 'index']).as('index')
-    router.get('/create', [KampanyesController, 'create']).as('create')
-    router.post('/', [KampanyesController, 'store']).as('store')
-    router.get('/:id', [KampanyesController, 'show']).as('show')
-    router.get('/:id/edit', [KampanyesController, 'edit']).as('edit')
-    router.put('/:id', [KampanyesController, 'update']).as('update')
-    router.delete('/:id', [KampanyesController, 'destroy']).as('destroy')
-  })
-  .prefix('/kampanyes')
-  .as('kampanyes')
+    // dashboard
+    router.get('/', [DashboardController, 'index']).as('dashboard')
 
-// donatur routes
-router
-  .group(() => {
-    router.get('/', [DonatursController, 'index']).as('index')
-    router.get('/create', [DonatursController, 'create']).as('create')
-    router.post('/', [DonatursController, 'store']).as('store')
-    router.get('/:id', [DonatursController, 'show']).as('show')
-    router.get('/:id/edit', [DonatursController, 'edit']).as('edit')
-    router.put('/:id', [DonatursController, 'update']).as('update')
-    router.delete('/:id', [DonatursController, 'destroy']).as('destroy')
-  })
-  .prefix('/donaturs')
-  .as('donaturs')
+    // kategori routes
+    router
+      .group(() => {
+        router.get('/', [KategorisController, 'index']).as('index')
+        router.get('/create', [KategorisController, 'create']).as('create')
+        router.post('/', [KategorisController, 'store']).as('store')
+        router.get('/:id', [KategorisController, 'show']).as('show')
+        router.get('/:id/edit', [KategorisController, 'edit']).as('edit')
+        router.put('/:id', [KategorisController, 'update']).as('update')
+        router.delete('/:id', [KategorisController, 'destroy']).as('destroy')
+      })
+      .prefix('/kategoris')
+      .as('kategoris')
 
-// donasi routes
-router
-  .group(() => {
-    router.get('/', [DonasisController, 'index']).as('index')
-    router.get('/create', [DonasisController, 'create']).as('create')
-    router.post('/', [DonasisController, 'store']).as('store')
-    router.get('/:id', [DonasisController, 'show']).as('show')
-    router.get('/:id/edit', [DonasisController, 'edit']).as('edit')
-    router.put('/:id', [DonasisController, 'update']).as('update')
-    router.patch('/:id/status', [DonasisController, 'updateStatus']).as('updateStatus')
-    router.delete('/:id', [DonasisController, 'destroy']).as('destroy')
+    // kampanye routes
+    router
+      .group(() => {
+        router.get('/', [KampanyesController, 'index']).as('index')
+        router.get('/create', [KampanyesController, 'create']).as('create')
+        router.post('/', [KampanyesController, 'store']).as('store')
+        router.get('/:id', [KampanyesController, 'show']).as('show')
+        router.get('/:id/edit', [KampanyesController, 'edit']).as('edit')
+        router.put('/:id', [KampanyesController, 'update']).as('update')
+        router.delete('/:id', [KampanyesController, 'destroy']).as('destroy')
+      })
+      .prefix('/kampanyes')
+      .as('kampanyes')
+
+    // donatur routes
+    router
+      .group(() => {
+        router.get('/', [DonatursController, 'index']).as('index')
+        router.get('/create', [DonatursController, 'create']).as('create')
+        router.post('/', [DonatursController, 'store']).as('store')
+        router.get('/:id', [DonatursController, 'show']).as('show')
+        router.get('/:id/edit', [DonatursController, 'edit']).as('edit')
+        router.put('/:id', [DonatursController, 'update']).as('update')
+        router.delete('/:id', [DonatursController, 'destroy']).as('destroy')
+      })
+      .prefix('/donaturs')
+      .as('donaturs')
+
+    // donasi routes
+    router
+      .group(() => {
+        router.get('/', [DonasisController, 'index']).as('index')
+        router.get('/create', [DonasisController, 'create']).as('create')
+        router.post('/', [DonasisController, 'store']).as('store')
+        router.get('/:id', [DonasisController, 'show']).as('show')
+        router.get('/:id/edit', [DonasisController, 'edit']).as('edit')
+        router.put('/:id', [DonasisController, 'update']).as('update')
+        router.patch('/:id/status', [DonasisController, 'updateStatus']).as('updateStatus')
+        router.delete('/:id', [DonasisController, 'destroy']).as('destroy')
+      })
+      .prefix('/donasis')
+      .as('donasis')
   })
-  .prefix('/donasis')
-  .as('donasis')
+  .use(middleware.auth({ guards: ['web'] }))
