@@ -204,8 +204,8 @@ export default class DonasisController {
       const donasiTerkumpul = totalDonasiTerkumpul?.total || 0
       const sisaTarget = transaksi.kampanye.target - donasiTerkumpul
 
-      // Validasi: donasi tidak boleh melebihi sisa target
-      if (transaksi.donasi.jumlah > sisaTarget) {
+      // Validasi: donasi tidak boleh melebihi sisa target jika status bukan FAILED
+      if (status !== 'FAILED' && transaksi.donasi.jumlah > sisaTarget) {
         session.flash(
           'error',
           `Donasi melebihi target kampanye! Target: Rp ${transaksi.kampanye.target.toLocaleString('id-ID')}, ` +

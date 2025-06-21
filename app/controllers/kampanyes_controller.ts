@@ -5,7 +5,12 @@ import { createKampanyeValidator, updateKampanyeValidator } from '#validators/ka
 
 export default class KampanyesController {
   async index({ view }: HttpContext) {
-    const kampanyes = await Kampanye.query().preload('kategori')
+    const kampanyes = await Kampanye.query()
+      .preload('kategori')
+      .preload('transaksiDonasis', (query) => {
+        query.where('status', 'success').preload('donasi')
+      })
+
     return view.render('pages/kampanye/index', { kampanyes })
   }
 
