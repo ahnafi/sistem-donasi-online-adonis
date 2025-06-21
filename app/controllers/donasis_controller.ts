@@ -17,6 +17,10 @@ export default class DonasisController {
       })
       .orderBy('created_at', 'desc')
 
+    // return {
+    //   test: donasis,
+    // }
+
     return view.render('pages/donasi/index', { donasis })
   }
 
@@ -33,6 +37,29 @@ export default class DonasisController {
       const payload = await request.validateUsing(createDonasiValidator)
 
       const kampanye = await Kampanye.findOrFail(payload.kampanyeId)
+
+      // Hitung total donasi yang sudah terkumpul untuk kampanye ini
+      const totalDonasiTerkumpul = await db
+        .from('transaksi_donasis')
+        .join('donasis', 'transaksi_donasis.donasi_id', 'donasis.id')
+        .where('transaksi_donasis.kampanye_id', payload.kampanyeId)
+        .where('transaksi_donasis.status', 'SUCCESS')
+        .sum('donasis.jumlah as total')
+        .first()
+
+      const donasiTerkumpul = totalDonasiTerkumpul?.total || 0
+      const sisaTarget = kampanye.target - donasiTerkumpul
+
+      // Validasi: donasi tidak boleh melebihi sisa target
+      if (payload.jumlah > sisaTarget) {
+        session.flash(
+          'error',
+          `Donasi melebihi target kampanye! Target: Rp ${kampanye.target.toLocaleString('id-ID')}, ` +
+            `Terkumpul: Rp ${donasiTerkumpul.toLocaleString('id-ID')}, ` +
+            `Sisa: Rp ${sisaTarget.toLocaleString('id-ID')}`
+        )
+        return response.redirect().back()
+      }
 
       const donasi = await Donasi.create(
         {
@@ -98,6 +125,30 @@ export default class DonasisController {
 
       const kampanye = await Kampanye.findOrFail(payload.kampanyeId)
 
+      // Hitung total donasi yang sudah terkumpul (kecuali donasi yang sedang diedit)
+      const totalDonasiTerkumpul = await db
+        .from('transaksi_donasis')
+        .join('donasis', 'transaksi_donasis.donasi_id', 'donasis.id')
+        .where('transaksi_donasis.kampanye_id', payload.kampanyeId)
+        .where('transaksi_donasis.status', 'SUCCESS')
+        .where('donasis.id', '!=', donasi.id)
+        .sum('donasis.jumlah as total')
+        .first()
+
+      const donasiTerkumpul = totalDonasiTerkumpul?.total || 0
+      const sisaTarget = kampanye.target - donasiTerkumpul
+
+      // Validasi: donasi tidak boleh melebihi sisa target
+      if (payload.jumlah > sisaTarget) {
+        session.flash(
+          'error',
+          `Donasi melebihi target kampanye! Target: Rp ${kampanye.target.toLocaleString('id-ID')}, ` +
+            `Terkumpul: Rp ${donasiTerkumpul.toLocaleString('id-ID')}, ` +
+            `Sisa: Rp ${sisaTarget.toLocaleString('id-ID')}`
+        )
+        return response.redirect().back()
+      }
+
       await donasi
         .merge({
           jumlah: payload.jumlah,
@@ -135,7 +186,34 @@ export default class DonasisController {
         return response.redirect().back()
       }
 
-      const transaksi = await TransaksiDonasi.query().where('donasi_id', params.id).firstOrFail()
+      const transaksi = await TransaksiDonasi.query()
+        .where('donasi_id', params.id)
+        .preload('kampanye')
+        .preload('donasi')
+        .firstOrFail()
+
+      // Hitung total donasi yang sudah terkumpul untuk kampanye ini
+      const totalDonasiTerkumpul = await db
+        .from('transaksi_donasis')
+        .join('donasis', 'transaksi_donasis.donasi_id', 'donasis.id')
+        .where('transaksi_donasis.kampanye_id', transaksi.kampanyeId)
+        .where('transaksi_donasis.status', 'SUCCESS')
+        .sum('donasis.jumlah as total')
+        .first()
+
+      const donasiTerkumpul = totalDonasiTerkumpul?.total || 0
+      const sisaTarget = transaksi.kampanye.target - donasiTerkumpul
+
+      // Validasi: donasi tidak boleh melebihi sisa target
+      if (transaksi.donasi.jumlah > sisaTarget) {
+        session.flash(
+          'error',
+          `Donasi melebihi target kampanye! Target: Rp ${transaksi.kampanye.target.toLocaleString('id-ID')}, ` +
+            `Terkumpul: Rp ${donasiTerkumpul.toLocaleString('id-ID')}, ` +
+            `Sisa: Rp ${sisaTarget.toLocaleString('id-ID')}`
+        )
+        return response.redirect().back()
+      }
 
       await transaksi.merge({ status }).save()
 
